@@ -1,0 +1,10 @@
+*.lock
+.metadata/
+.recommenders/
+
+*/bin/
+*/.classpath
+*/.project
+*/.settings
+
+*/target
