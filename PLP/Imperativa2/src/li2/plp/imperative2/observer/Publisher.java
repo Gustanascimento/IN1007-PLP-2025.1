@@ -3,6 +3,8 @@ package li2.plp.imperative2.observer;
 import java.util.List;
 import java.util.Map;
 
+import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+
 public abstract class Publisher {
   
   Map<String, List<Subscriber>> listeners;
@@ -17,10 +19,10 @@ public abstract class Publisher {
     subscribers.remove(s);
   }
 
-  public void notifySubscribers(String eventType, Object context) {
+  public void notifySubscribers(String eventType, AmbienteExecucaoImperativa2 amb) {
     List<Subscriber> subscribers = listeners.get(eventType);
         for (Subscriber listener : subscribers) {
-            listener.update(eventType, context);
+            listener.update(eventType, amb);
         }
   }
 

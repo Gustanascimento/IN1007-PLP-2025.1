@@ -1,12 +1,15 @@
 package li2.plp.imperative2.memory;
 
 import li2.plp.expressions2.expression.Id;
+import li2.plp.expressions2.expression.Valor;
 import li2.plp.expressions2.memory.Contexto;
 import li2.plp.expressions2.memory.VariavelJaDeclaradaException;
 import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 import li2.plp.imperative1.memory.ContextoExecucaoImperativa;
 import li2.plp.imperative1.memory.ListaValor;
 import li2.plp.imperative2.declaration.DefProcedimento;
+import li2.plp.imperative2.declaration.DefReativo;
+import li2.plp.imperative2.observer.Subscriber;
 
 public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		implements AmbienteExecucaoImperativa2 {
@@ -16,6 +19,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 * armazena apenas procedimentos.
 	 */
 	private Contexto<DefProcedimento> contextoProcedimentos;
+	private Contexto<DefReativo> contextoReativo;
 
 	/**
 	 * Construtor da classe.
@@ -23,18 +27,21 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	public ContextoExecucaoImperativa2(ListaValor entrada) {
 		super(entrada);
 		contextoProcedimentos = new Contexto<DefProcedimento>();
+		contextoReativo = new Contexto<DefReativo>();
 	}
 
 	@Override
 	public void incrementa() {
 		super.incrementa();
 		this.contextoProcedimentos.incrementa();
+		this.contextoReativo.incrementa();
 	}
 
 	@Override
 	public void restaura() {
 		super.restaura();
 		this.contextoProcedimentos.restaura();
+		this.contextoReativo.restaura();
 	}
 
 	/**
@@ -69,4 +76,34 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 
 	}
+
+	@Override
+	public void map(Id idArg, Valor valorId) {
+		DefReativo reativo = new DefReativo();
+		super.map(idArg, valorId);
+		try {
+			this.contextoReativo.map(idArg, reativo);
+		} catch (Exception e) {
+			throw new VariavelReativaJaDeclaradaException(idArg);
+		}
+		
+	}
+
+	public Valor get(Id idArg, Subscriber s) {
+		try {
+			DefReativo reativo = this.contextoReativo.get(idArg);
+			if (s != null) reativo.subscribe(s);
+		} catch (VariavelNaoDeclaradaException e) {
+			throw new VariavelReativaNaoDeclaradaException(idArg);
+		}
+		return super.get(idArg);
+	}
+
+	@Override
+	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {
+		super.changeValor(idArg, valorId);
+		DefReativo reativo = this.contextoReativo.get(idArg);
+		reativo.notifySubscribers(this);
+	}
+
 }

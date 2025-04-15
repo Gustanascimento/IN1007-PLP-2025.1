@@ -2,35 +2,64 @@ package li2.plp.imperative2.declaration;
 
 import li2.plp.expressions2.expression.Expressao;
 import li2.plp.expressions2.expression.Id;
+import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
+import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 import li2.plp.imperative1.declaration.DeclaracaoVariavel;
-import li2.plp.imperative2.observer.Publisher;
+import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
+import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
+import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.observer.Subscriber;
 
 public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Subscriber {
 
-  private Publisher pub;
-
-  public DeclaracaoVariavelReativa(Id id, Expressao expressao, Publisher pub) {
+  public DeclaracaoVariavelReativa(Id id, Expressao expressao) {
     super(id, expressao);
-    this.pub = pub;
   }
 
   @Override
-  public void update(String eventType, Object context) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'update'");
+  public void update(String eventType, AmbienteExecucaoImperativa2 amb) {
+    amb.changeValor(getId(), getExpressao().avaliar(amb));
   }
 
-  public void subscribe(Subscriber s, String eventType) {
-    pub.subscribe(s, eventType);
-  }
+  /**
+	 * Cria um mapeamento do identificador para o valor da express�o desta
+	 * declara��o no AmbienteExecucao
+	 * 
+	 * @param ambiente
+	 *            o ambiente que contem o mapeamento entre identificadores e
+	 *            valores.
+	 * 
+	 * @return o ambiente modificado pela inicializa��o da vari�vel.
+	 */
+	@Override
+	public AmbienteExecucaoImperativa elabora(
+			AmbienteExecucaoImperativa ambiente)
+			throws IdentificadorJaDeclaradoException,
+			IdentificadorNaoDeclaradoException {
+		((AmbienteExecucaoImperativa2) ambiente).map(getId(), getExpressao().avaliar(ambiente));
+		return ambiente;
+	}
 
-  public void unsubscribe(Subscriber s, String eventType) {
-    pub.unsubscribe(s, eventType);
-  }
-
-  public void notifySubscribers(String eventType, Object context) {
-    pub.notifySubscribers(eventType, context);
-  }
+	/**
+	 * Vai ter que verificar dependências cíclicas
+	 * 
+	 * @param ambiente
+	 *            o ambiente que contem o mapeamento entre identificadores e
+	 *            seus tipos.
+	 * 
+	 * @return <code>true</code> se os tipos da declara��o s�o v�lidos;
+	 *         <code>false</code> caso contrario.
+	 * 
+	 */
+	@Override
+	public boolean checaTipo(AmbienteCompilacaoImperativa ambiente)
+			throws IdentificadorJaDeclaradoException,
+			IdentificadorNaoDeclaradoException {
+		boolean result = getExpressao().checaTipo(ambiente);
+		if (result) {
+			ambiente.map(getId(), getExpressao().getTipo(ambiente));
+		}
+		return result;
+	}
 
 }
