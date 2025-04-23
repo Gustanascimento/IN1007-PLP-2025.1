@@ -81,7 +81,7 @@ public class Contexto<T> {
 	 * 
 	 * @return Stack
 	 */
-	protected Stack<HashMap<Id, T>> getPilha() {
+	public Stack<HashMap<Id, T>> getPilha() {
 		return pilha;
 	}
 

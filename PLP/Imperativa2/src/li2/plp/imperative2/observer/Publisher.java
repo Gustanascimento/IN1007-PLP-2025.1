@@ -21,8 +21,8 @@ public abstract class Publisher {
 
   public void notifySubscribers(String eventType, AmbienteExecucaoImperativa2 amb) {
     List<Subscriber> subscribers = listeners.get(eventType);
-        for (Subscriber listener : subscribers) {
-            listener.update(eventType, amb);
+        for (Subscriber subscriber : subscribers) {
+            subscriber.update(eventType, amb);
         }
   }
 

@@ -1,5 +1,8 @@
 package li2.plp.imperative2.memory;
 
+import java.util.HashMap;
+import java.util.Stack;
+
 import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.expression.Valor;
 import li2.plp.expressions2.memory.Contexto;
@@ -74,36 +77,60 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		} catch (VariavelNaoDeclaradaException e) {
 			throw new ProcedimentoNaoDeclaradoException(idArg);
 		}
-
 	}
 
-	@Override
-	public void map(Id idArg, Valor valorId) {
-		DefReativo reativo = new DefReativo();
-		super.map(idArg, valorId);
+	public void mapReativo(Id idArg, Valor valorId, Subscriber s) {
+		DefReativo reativo = new DefReativo(s);
 		try {
 			this.contextoReativo.map(idArg, reativo);
 		} catch (Exception e) {
 			throw new VariavelReativaJaDeclaradaException(idArg);
 		}
-		
+		this.map(idArg, valorId);
 	}
 
-	public Valor get(Id idArg, Subscriber s) {
+	/**
+	 * Limpa todas as dependências de um subscriber.
+	 * 
+	 */
+	public void limpaDependencias(Subscriber s) {
+		Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
+		Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
+		
+		while (!stack.empty()) {
+			HashMap<Id,DefReativo> aux = stack.pop();
+			auxStack.push(aux);
+			for (DefReativo react : aux.values()) {
+				react.unsubscribe(s);
+			}
+		}
+		while (!auxStack.empty()) {
+			stack.push(auxStack.pop());
+		}
+	}
+
+	// isso aqui serve pra, quando vc vai pegar o valor de um id, vc se inscreve nesse id, pois vc depende dele.
+	// Não sei se vai dar certo.
+	public Valor get(Id idArg, Id idTarget) {
 		try {
-			DefReativo reativo = this.contextoReativo.get(idArg);
-			if (s != null) reativo.subscribe(s);
+			DefReativo reativoTarget = this.contextoReativo.get(idTarget);
+			if (reativoTarget != null) {
+				Subscriber s = reativoTarget.getSubscriber();
+				DefReativo reativo = this.contextoReativo.get(idArg);
+				if (s != null) reativo.subscribe(s);
+			}
 		} catch (VariavelNaoDeclaradaException e) {
 			throw new VariavelReativaNaoDeclaradaException(idArg);
 		}
 		return super.get(idArg);
 	}
 
-	@Override
-	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {
+	public void changeValor(Id idArg, Valor valorId, Subscriber s) throws VariavelNaoDeclaradaException {
 		super.changeValor(idArg, valorId);
-		DefReativo reativo = this.contextoReativo.get(idArg);
-		reativo.notifySubscribers(this);
+		if (s != null) {
+			DefReativo reativo = this.contextoReativo.get(idArg);
+			reativo.notifySubscribers(this);
+		}
 	}
 
 }
