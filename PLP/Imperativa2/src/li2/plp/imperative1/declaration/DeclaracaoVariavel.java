@@ -7,7 +7,7 @@ import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 
-public class DeclaracaoVariavel extends Declaracao {
+public abstract class DeclaracaoVariavel extends Declaracao {
 
 	private Id id;
 	private Expressao expressao;
