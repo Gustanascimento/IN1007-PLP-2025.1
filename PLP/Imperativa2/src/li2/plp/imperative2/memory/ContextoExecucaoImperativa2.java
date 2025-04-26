@@ -82,6 +82,14 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
+	public DefReativo getReativo(Id idArg) {
+		try {
+			return this.contextoReativo.get(idArg);
+		} catch (VariavelNaoDeclaradaException e) {
+			return null;
+		}
+	}
+
 	public void iniciaMapReativo(Id idArg, Subscriber s) {
 		DefReativo reativo = new DefReativo(s);
 		try {
@@ -93,7 +101,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	}
 
 	public void terminaMapReativo(Id idArg) {
-		DefReativo reativo = this.contextoReativo.get(idArg);
+		DefReativo reativo = getReativo(idArg);
 		for (Subscriber s : subscribers) {
 			reativo.subscribe(s);
 		}
@@ -105,8 +113,8 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 * 
 	 */
 	public void limpaDependencias(Id idArg) {
-		try {
-			DefReativo reativo = this.contextoReativo.get(idArg);
+		DefReativo reativo = getReativo(idArg);
+		if (reativo != null) {
 			Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
 			Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
 			
@@ -122,21 +130,14 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 			while (!auxStack.empty()) {
 				stack.push(auxStack.pop());
 			}
-		} catch (VariavelNaoDeclaradaException e) {
-			// Variável não é reativa
-			return;
 		}
 	}
 
 	@Override
 	public Valor get(Id idArg) throws VariavelNaoDeclaradaException {
 		if (subscribers != null) {
-			try {
-				DefReativo reativo = this.contextoReativo.get(idArg);
-				subscribers.add(reativo.getSubscriber());
-			} catch (VariavelNaoDeclaradaException e) {
-				// Variável não é reativa
-			}
+			DefReativo reativo = getReativo(idArg);
+			if (reativo != null) subscribers.add(reativo.getSubscriber());
 		}
 		return super.get(idArg);
 	}
@@ -161,14 +162,9 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {
 		// id se atualiza
 		super.changeValor(idArg, valorId);
-		try {
-			// se ele for reativo, atualiza as variáveis reativas que dependem dele
-			DefReativo reativo = this.contextoReativo.get(idArg);
-			reativo.notifySubscribers(this);
-		} catch (VariavelNaoDeclaradaException e) {
-			// não é reativo
-			return;
-		}
+		// se ele for reativo, atualiza as variáveis reativas que dependem dele
+		DefReativo reativo = getReativo(idArg);
+		if (reativo != null) reativo.notifySubscribers(this);
 	}
 
 }
