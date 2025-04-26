@@ -1,6 +1,8 @@
 package li2.plp.imperative2.memory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Stack;
 
 import li2.plp.expressions2.expression.Id;
@@ -23,6 +25,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 */
 	private Contexto<DefProcedimento> contextoProcedimentos;
 	private Contexto<DefReativo> contextoReativo;
+	private List<Subscriber> subscribers;
 
 	/**
 	 * Construtor da classe.
@@ -79,57 +82,92 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public void mapReativo(Id idArg, Valor valorId, Subscriber s) {
+	public void iniciaMapReativo(Id idArg, Subscriber s) {
 		DefReativo reativo = new DefReativo(s);
 		try {
 			this.contextoReativo.map(idArg, reativo);
+			this.subscribers = new ArrayList<>();
 		} catch (Exception e) {
 			throw new VariavelReativaJaDeclaradaException(idArg);
 		}
-		this.map(idArg, valorId);
+	}
+
+	public void terminaMapReativo(Id idArg) {
+		DefReativo reativo = this.contextoReativo.get(idArg);
+		for (Subscriber s : subscribers) {
+			reativo.subscribe(s);
+		}
+		subscribers = null;
 	}
 
 	/**
 	 * Limpa todas as dependências de um subscriber.
 	 * 
 	 */
-	public void limpaDependencias(Subscriber s) {
-		Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
-		Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
-		
-		while (!stack.empty()) {
-			HashMap<Id,DefReativo> aux = stack.pop();
-			auxStack.push(aux);
-			for (DefReativo react : aux.values()) {
-				react.unsubscribe(s);
+	public void limpaDependencias(Id idArg) {
+		try {
+			DefReativo reativo = this.contextoReativo.get(idArg);
+			Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
+			Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
+			
+			while (!stack.empty()) {
+				HashMap<Id,DefReativo> aux = stack.pop();
+				auxStack.push(aux);
+				
+				Subscriber s = reativo.getSubscriber();
+				for (DefReativo react : aux.values()) {
+					react.unsubscribe(s);
+				}
 			}
-		}
-		while (!auxStack.empty()) {
-			stack.push(auxStack.pop());
+			while (!auxStack.empty()) {
+				stack.push(auxStack.pop());
+			}
+		} catch (VariavelNaoDeclaradaException e) {
+			// Variável não é reativa
+			return;
 		}
 	}
 
-	// isso aqui serve pra, quando vc vai pegar o valor de um id, vc se inscreve nesse id, pois vc depende dele.
-	// Não sei se vai dar certo.
-	public Valor get(Id idArg, Id idTarget) {
-		try {
-			DefReativo reativoTarget = this.contextoReativo.get(idTarget);
-			if (reativoTarget != null) {
-				Subscriber s = reativoTarget.getSubscriber();
+	@Override
+	public Valor get(Id idArg) throws VariavelNaoDeclaradaException {
+		if (subscribers != null) {
+			try {
 				DefReativo reativo = this.contextoReativo.get(idArg);
-				if (s != null) reativo.subscribe(s);
+				subscribers.add(reativo.getSubscriber());
+			} catch (VariavelNaoDeclaradaException e) {
+				// Variável não é reativa
 			}
-		} catch (VariavelNaoDeclaradaException e) {
-			throw new VariavelReativaNaoDeclaradaException(idArg);
 		}
 		return super.get(idArg);
 	}
 
-	public void changeValor(Id idArg, Valor valorId, Subscriber s) throws VariavelNaoDeclaradaException {
+	// // isso aqui serve pra, quando vc vai pegar o valor de um id, vc se inscreve nesse id, pois vc depende dele.
+	// // Não sei se vai dar certo.
+	// public Valor get(Id idArg, Id idTarget) {
+	// 	try {
+	// 		DefReativo reativoTarget = this.contextoReativo.get(idTarget);
+	// 		if (reativoTarget != null) {
+	// 			Subscriber s = reativoTarget.getSubscriber();
+	// 			DefReativo reativo = this.contextoReativo.get(idArg);
+	// 			if (s != null) reativo.subscribe(s);
+	// 		}
+	// 	} catch (VariavelNaoDeclaradaException e) {
+	// 		throw new VariavelReativaNaoDeclaradaException(idArg);
+	// 	}
+	// 	return super.get(idArg);
+	// }
+
+	@Override
+	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {
+		// id se atualiza
 		super.changeValor(idArg, valorId);
-		if (s != null) {
+		try {
+			// se ele for reativo, atualiza as variáveis reativas que dependem dele
 			DefReativo reativo = this.contextoReativo.get(idArg);
 			reativo.notifySubscribers(this);
+		} catch (VariavelNaoDeclaradaException e) {
+			// não é reativo
+			return;
 		}
 	}
 
