@@ -100,16 +100,25 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public void terminaMapReativo(Id idArg) {
+	public void iniciaAtribuicaoReativa(Id idArg) {
 		DefReativo reativo = getReativo(idArg);
-		for (Subscriber s : subscribers) {
-			reativo.subscribe(s);
+		if (reativo != null) {
+			this.subscribers = new ArrayList<>();
 		}
-		subscribers = null;
+	}
+
+	public void terminaComandoReativo(Id idArg) {
+		DefReativo reativo = getReativo(idArg);
+		if (reativo != null) {
+			for (Subscriber s : subscribers) {
+				reativo.subscribe(s);
+			}
+			subscribers = null;
+		}
 	}
 
 	/**
-	 * Limpa todas as dependências de um subscriber.
+	 * Limpa todas as dependências de um reativo.
 	 * 
 	 */
 	public void limpaDependencias(Id idArg) {
@@ -141,22 +150,6 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 		return super.get(idArg);
 	}
-
-	// // isso aqui serve pra, quando vc vai pegar o valor de um id, vc se inscreve nesse id, pois vc depende dele.
-	// // Não sei se vai dar certo.
-	// public Valor get(Id idArg, Id idTarget) {
-	// 	try {
-	// 		DefReativo reativoTarget = this.contextoReativo.get(idTarget);
-	// 		if (reativoTarget != null) {
-	// 			Subscriber s = reativoTarget.getSubscriber();
-	// 			DefReativo reativo = this.contextoReativo.get(idArg);
-	// 			if (s != null) reativo.subscribe(s);
-	// 		}
-	// 	} catch (VariavelNaoDeclaradaException e) {
-	// 		throw new VariavelReativaNaoDeclaradaException(idArg);
-	// 	}
-	// 	return super.get(idArg);
-	// }
 
 	@Override
 	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {

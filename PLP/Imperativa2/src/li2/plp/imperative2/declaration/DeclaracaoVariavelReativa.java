@@ -39,7 +39,7 @@ public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Sub
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
 		amb2.iniciaMapReativo(getId(), this);
 		amb2.map(getId(), getExpressao().avaliar(amb2));
-		amb2.terminaMapReativo(getId());
+		amb2.terminaComandoReativo(getId());
 		return amb2;
 	}
 
