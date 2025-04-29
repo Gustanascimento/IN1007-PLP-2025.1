@@ -25,7 +25,8 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 */
 	private Contexto<DefProcedimento> contextoProcedimentos;
 	private Contexto<DefReativo> contextoReativo;
-	private List<Subscriber> subscribers;
+	private List<DefReativo> publishers;
+	private Id idReativoCorrente;
 
 	/**
 	 * Construtor da classe.
@@ -90,11 +91,16 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
+	private void iniciaReativo(Id idArg) {
+		this.publishers = new ArrayList<>();
+		this.idReativoCorrente = idArg;
+	}
+
 	public void iniciaMapReativo(Id idArg, Subscriber s) {
 		DefReativo reativo = new DefReativo(s);
 		try {
 			this.contextoReativo.map(idArg, reativo);
-			this.subscribers = new ArrayList<>();
+			iniciaReativo(idArg);
 		} catch (Exception e) {
 			throw new VariavelReativaJaDeclaradaException(idArg);
 		}
@@ -103,17 +109,19 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	public void iniciaAtribuicaoReativa(Id idArg) {
 		DefReativo reativo = getReativo(idArg);
 		if (reativo != null) {
-			this.subscribers = new ArrayList<>();
+			iniciaReativo(idArg);
 		}
 	}
 
 	public void terminaComandoReativo(Id idArg) {
 		DefReativo reativo = getReativo(idArg);
 		if (reativo != null) {
-			for (Subscriber s : subscribers) {
-				reativo.subscribe(s);
+			Subscriber s = reativo.getSubscriber();
+			for (DefReativo p : publishers) {
+				p.subscribe(s);
 			}
-			subscribers = null;
+			publishers = null;
+			idReativoCorrente = null;
 		}
 	}
 
@@ -133,7 +141,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 				
 				Subscriber s = reativo.getSubscriber();
 				for (DefReativo react : aux.values()) {
-					react.unsubscribe(s);
+					react.unsubscribe(s); // se desinscreve de todos que ele depende
 				}
 			}
 			while (!auxStack.empty()) {
@@ -144,9 +152,10 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 
 	@Override
 	public Valor get(Id idArg) throws VariavelNaoDeclaradaException {
-		if (subscribers != null) {
+		if (publishers != null) {
 			DefReativo reativo = getReativo(idArg);
-			if (reativo != null) subscribers.add(reativo.getSubscriber());
+			// é reativo e não é igual ao reativo corrente (variável reativa não pode depender dela mesma)
+			if (reativo != null && !idArg.equals(this.idReativoCorrente)) publishers.add(reativo);
 		}
 		return super.get(idArg);
 	}

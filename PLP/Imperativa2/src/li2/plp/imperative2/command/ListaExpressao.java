@@ -51,4 +51,15 @@ public class ListaExpressao extends Lista<Expressao> {
 		return result;
 	}
 
+	public boolean checaTipo(AmbienteCompilacaoImperativa ambiente) {
+		if (length() == 0) {
+			return true;
+		}
+		if (length() == 1) {
+			return getHead().checaTipo(ambiente);
+		}
+
+		return getHead().checaTipo(ambiente) && ((ListaExpressao) getTail()).checaTipo(ambiente);
+	}
+
 }
