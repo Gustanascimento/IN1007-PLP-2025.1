@@ -1,6 +1,5 @@
 package li2.plp.imperative2.observer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,13 +9,7 @@ public abstract class Publisher {
   
   Map<String, List<Subscriber>> listeners;
 
-  private List<Subscriber> getSubscribers(String eventType) {
-    List<Subscriber> subscribers = listeners.get(eventType);
-    if (subscribers == null) {
-      subscribers = new ArrayList<>();
-    }
-    return subscribers;
-  }
+  abstract List<Subscriber> getSubscribers(String eventType);
 
   public void subscribe(Subscriber s, String eventType) {
     getSubscribers(eventType).add(s);
