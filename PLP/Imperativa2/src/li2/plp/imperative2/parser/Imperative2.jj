@@ -126,14 +126,14 @@ TOKEN : /* TOKENS DE IMPERATIVA 1 */
 | < IF: "if" >
 | < THEN: "then" >
 | < ELSE: "else" >
-| < REACT: "react" >
-| < WATCH: "watch" >
 }
 
 TOKEN : /* TOKENS DE IMPERATIVA 2 */
 {
   < PROC: "proc" >
 | < CALL: "call" >
+| < REACT: "react" >
+| < WATCH: "watch" >
 }
 
 TOKEN : /* TOKENS DOS POSS�VEIS TIPOS */
@@ -398,19 +398,6 @@ Id PId() :
 	}
 }
 
-Watch PWatch() :
-{
-	Expressao expressao;
-	Comando comandoWatch;
-}
-{
-	<WATCH> <LBRACKET>
-		expressao = PExpressao()
-	<RBRACKET>
-		comandoWatch = PComando()
-	{return new Watch(expressao, comandoWatch);}
-}
-
 
 Valor PValorInteiro() :
 {
@@ -656,7 +643,6 @@ Comando PComandoSimples() :
       | retorno = PComandoDeclaracao()
       | retorno = PWhile()
       | retorno = PIfThenElse()
-      | retorno = PWatch()
       | retorno = PIO()
       | <LPAREN> retorno = PComando() <RPAREN>
       | retorno = PChamadaProcedimento()
@@ -699,14 +685,17 @@ Declaracao PDeclaracao():
 {
 	(
 		  LOOKAHEAD(PDeclaracaoVariavelSimples() <COMMA>)
-           retorno = PDeclaracaoComposta()
+				retorno = PDeclaracaoComposta()
 		  |LOOKAHEAD(PDeclaracaoVariavelReativa() <COMMA>)
-           retorno = PDeclaracaoComposta()
-          |LOOKAHEAD(PDeclaracaoProcedimento() <COMMA>)
-           retorno = PDeclaracaoComposta() 
+				retorno = PDeclaracaoComposta()
+			|LOOKAHEAD(PDeclaracaoProcedimento() <COMMA>)
+				retorno = PDeclaracaoComposta() 
+			|LOOKAHEAD(PDeclaracaoObservador() <COMMA>)
+			retorno = PDeclaracaoComposta() 
 		  | retorno = PDeclaracaoVariavelSimples()
 		  | retorno = PDeclaracaoProcedimento()
 		  | retorno = PDeclaracaoVariavelReativa()
+		  | retorno = PDeclaracaoObservador()
           | <LPAREN> retorno = PDeclaracao() <RPAREN>   		 
 		  
 	)
@@ -726,7 +715,10 @@ DeclaracaoComposta PDeclaracaoComposta():
 	  d1 = PDeclaracaoVariavelReativa() <COMMA> d2 = PDeclaracao()
 
 	 |  LOOKAHEAD(PDeclaracaoProcedimento() <COMMA>)
-	 d1 = PDeclaracaoProcedimento() <COMMA> d2 = PDeclaracao()
+	 	d1 = PDeclaracaoProcedimento() <COMMA> d2 = PDeclaracao()
+
+	 |  LOOKAHEAD(PDeclaracaoObservador() <COMMA>)
+	 	d1 = PDeclaracaoObservador() <COMMA> d2 = PDeclaracao()
 	)
 	
 	{return new DeclaracaoComposta(d1, d2);}
@@ -848,4 +840,17 @@ DeclaracaoVariavelReativa PDeclaracaoVariavelReativa() :
 	{
 		return retorno;
 	}
+}
+
+DeclaracaoObservador PDeclaracaoObservador() :
+{
+	ListaExpressao expressoes;
+	DefProcedimento defProcedimento;
+}
+{
+	<WATCH> <LBRACKET>
+		expressoes = PListaExpressao()
+	<RBRACKET>
+	defProcedimento = PDefProcedimento()
+	{return new DeclaracaoObservador(expressoes, defProcedimento);}
 }

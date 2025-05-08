@@ -8,6 +8,7 @@ public class DefReativo extends VariavelReativaPublisher {
   private Subscriber s;
 
   public DefReativo(Subscriber s) {
+    super();
     this.s = s;
   }
 

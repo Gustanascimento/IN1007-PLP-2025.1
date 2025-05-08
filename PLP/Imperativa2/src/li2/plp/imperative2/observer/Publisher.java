@@ -1,5 +1,6 @@
 package li2.plp.imperative2.observer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,18 +10,24 @@ public abstract class Publisher {
   
   Map<String, List<Subscriber>> listeners;
 
-  public void subscribe(Subscriber s, String eventType) {
+  private List<Subscriber> getSubscribers(String eventType) {
     List<Subscriber> subscribers = listeners.get(eventType);
-    subscribers.add(s);
+    if (subscribers == null) {
+      subscribers = new ArrayList<>();
+    }
+    return subscribers;
+  }
+
+  public void subscribe(Subscriber s, String eventType) {
+    getSubscribers(eventType).add(s);
   }
 
   public void unsubscribe(Subscriber s, String eventType) {
-    List<Subscriber> subscribers = listeners.get(eventType);
-    subscribers.remove(s);
+    getSubscribers(eventType).remove(s);
   }
 
   public void notifySubscribers(String eventType, AmbienteExecucaoImperativa2 amb) {
-    List<Subscriber> subscribers = listeners.get(eventType);
+    List<Subscriber> subscribers = getSubscribers(eventType);
         for (Subscriber subscriber : subscribers) {
             subscriber.update(eventType, amb);
         }
