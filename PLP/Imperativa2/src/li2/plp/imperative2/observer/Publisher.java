@@ -9,7 +9,7 @@ public abstract class Publisher {
   
   Map<String, List<Subscriber>> listeners;
 
-  abstract List<Subscriber> getSubscribers(String eventType);
+  abstract public List<Subscriber> getSubscribers(String eventType);
 
   public void subscribe(Subscriber s, String eventType) {
     getSubscribers(eventType).add(s);

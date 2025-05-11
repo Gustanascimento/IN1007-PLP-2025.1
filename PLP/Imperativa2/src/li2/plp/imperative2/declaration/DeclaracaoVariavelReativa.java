@@ -1,5 +1,7 @@
 package li2.plp.imperative2.declaration;
 
+import java.util.logging.Logger;
+
 import li2.plp.expressions2.expression.Expressao;
 import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
@@ -9,8 +11,10 @@ import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.observer.Subscriber;
+import li2.plp.imperative2.util.LoggerConfig;
 
 public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Subscriber {
+	private static final Logger logger = LoggerConfig.getLogger();
 
   public DeclaracaoVariavelReativa(Id id, Expressao expressao) {
     super(id, expressao);

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
+import java.util.logging.Logger;
 
 import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.expression.Valor;
@@ -12,12 +13,15 @@ import li2.plp.expressions2.memory.VariavelJaDeclaradaException;
 import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 import li2.plp.imperative1.memory.ContextoExecucaoImperativa;
 import li2.plp.imperative1.memory.ListaValor;
+import li2.plp.imperative2.declaration.DeclaracaoVariavelReativa;
 import li2.plp.imperative2.declaration.DefProcedimento;
 import li2.plp.imperative2.declaration.DefReativo;
 import li2.plp.imperative2.observer.Subscriber;
+import li2.plp.imperative2.util.LoggerConfig;
 
 public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		implements AmbienteExecucaoImperativa2 {
+	private static final Logger logger = LoggerConfig.getLogger();
 
 	/**
 	 * O contexto de procedimentos faz as vezes de um contexto de execu��o que
@@ -83,7 +87,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public DefReativo getReativo(Id idArg) {
+	private DefReativo getReativo(Id idArg) {
 		try {
 			return this.contextoReativo.get(idArg);
 		} catch (VariavelNaoDeclaradaException e) {
@@ -131,22 +135,26 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 */
 	public void limpaDependencias(Id idArg) {
 		DefReativo reativo = getReativo(idArg);
-		if (reativo != null) {
-			Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
-			Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
+		if (reativo == null) return;
+
+		Subscriber s = reativo.getSubscriber();
+		if (s == null) return;
+		
+		Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
+		Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
 			
-			while (!stack.empty()) {
-				HashMap<Id,DefReativo> aux = stack.pop();
-				auxStack.push(aux);
-				
-				Subscriber s = reativo.getSubscriber();
-				for (DefReativo react : aux.values()) {
-					react.unsubscribe(s); // se desinscreve de todos que ele depende
-				}
+		while (!stack.empty()) {
+			HashMap<Id,DefReativo> aux = stack.pop();
+			
+			for (DefReativo react : aux.values()) {
+				react.unsubscribe(s); // se desinscreve de todos que ele depende
 			}
-			while (!auxStack.empty()) {
-				stack.push(auxStack.pop());
-			}
+
+			auxStack.push(aux);
+		}
+		// coloca de volta na stack
+		while (!auxStack.empty()) {
+			stack.push(auxStack.pop());
 		}
 	}
 
@@ -168,5 +176,61 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		DefReativo reativo = getReativo(idArg);
 		if (reativo != null) reativo.notifySubscribers(this);
 	}
+
+// /**
+//  * Verifica se há ciclos de dependências entre variáveis reativas.
+//  * 
+//  * @throws CicloDeDependenciaException se um ciclo for detectado.
+//  */
+// public void verificaCiclosDeDependencia() throws CicloDeDependenciaException {
+//     HashMap<Id, Boolean> visitados = new HashMap<>();
+//     HashMap<Id, Boolean> pilhaRecursiva = new HashMap<>();
+
+//     // Itera sobre todos os identificadores na pilha do contexto reativo
+//     for (HashMap<Id, DefReativo> mapa : contextoReativo.getPilha()) {
+//         for (Id id : mapa.keySet()) {
+//             if (detectaCiclo(id, visitados, pilhaRecursiva)) {
+//                 throw new CicloDeDependenciaException("Ciclo de dependência detectado envolvendo a variável: " + id);
+//             }
+//         }
+//     }
+// }
+
+// /**
+//  * Função auxiliar para detectar ciclos usando busca em profundidade (DFS).
+//  */
+// private boolean detectaCiclo(Id id, HashMap<Id, Boolean> visitados, HashMap<Id, Boolean> pilhaRecursiva) {
+//     // Se a variável já está na pilha de recursão, há um ciclo
+//     if (pilhaRecursiva.getOrDefault(id, false)) {
+//         return true;
+//     }
+
+//     // Se já foi visitado e não está na pilha de recursão, não há ciclo
+//     if (visitados.getOrDefault(id, false)) {
+//         return false;
+//     }
+
+//     // Marca a variável como visitada e adiciona à pilha de recursão
+//     visitados.put(id, true);
+//     pilhaRecursiva.put(id, true);
+
+//     // Obtém o DefReativo associado à variável
+//     DefReativo reativo = getReativo(id);
+//     if (reativo != null) {
+//         // Itera sobre os dependentes (subscribers) da variável
+//         for (Subscriber subscriber : reativo.getSubscribers("update")) {
+//             if (subscriber instanceof DeclaracaoVariavelReativa) {
+//                 DeclaracaoVariavelReativa variavelReativa = (DeclaracaoVariavelReativa) subscriber;
+//                 if (detectaCiclo(variavelReativa.getId(), visitados, pilhaRecursiva)) {
+//                     return true;
+//                 }
+//             }
+//         }
+//     }
+
+//     // Remove a variável da pilha de recursão
+//     pilhaRecursiva.put(id, false);
+//     return false;
+// }
 
 }
