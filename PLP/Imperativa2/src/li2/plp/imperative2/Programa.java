@@ -8,6 +8,7 @@ import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
 import li2.plp.imperative1.memory.ListaValor;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 
 public class Programa {
 
@@ -25,6 +26,7 @@ public class Programa {
 	 * 
 	 * @return o ambiente depois de modificado pela execu��o do programa.
 	 * @throws ErroTipoEntradaException 
+	 * @throws CicloDeDependenciaException 
 	 * 
 	 * @exception EntradaNaoFornecidaException
 	 *                se n�o for fornecida a tail de valores de entrada do
@@ -33,7 +35,7 @@ public class Programa {
 	 */
 	public ListaValor executar(AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException {
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException {
 		ambiente = comando.executar(ambiente);
 		return ambiente.getSaida();
 	}

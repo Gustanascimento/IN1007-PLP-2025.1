@@ -10,6 +10,7 @@ import li2.plp.imperative1.declaration.DeclaracaoVariavel;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 import li2.plp.imperative2.observer.Subscriber;
 import li2.plp.imperative2.util.LoggerConfig;
 
@@ -34,12 +35,13 @@ public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Sub
 	 *            valores.
 	 * 
 	 * @return o ambiente modificado pela inicializa��o da vari�vel.
+   * @throws CicloDeDependenciaException 
 	 */
 	@Override
 	public AmbienteExecucaoImperativa elabora(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException {
+			IdentificadorNaoDeclaradoException, CicloDeDependenciaException {
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
 		amb2.iniciaMapReativo(getId(), this);
 		amb2.map(getId(), getExpressao().avaliar(amb2));

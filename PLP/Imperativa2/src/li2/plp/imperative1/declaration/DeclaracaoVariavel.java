@@ -6,6 +6,7 @@ import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
 import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 
 public abstract class DeclaracaoVariavel extends Declaracao {
 
@@ -27,12 +28,13 @@ public abstract class DeclaracaoVariavel extends Declaracao {
 	 *            valores.
 	 * 
 	 * @return o ambiente modificado pela inicializa��o da vari�vel.
+	 * @throws CicloDeDependenciaException 
 	 */
 	@Override
 	public AmbienteExecucaoImperativa elabora(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException {
+			IdentificadorNaoDeclaradoException, CicloDeDependenciaException {
 		ambiente.map(getId(), getExpressao().avaliar(ambiente));
 		return ambiente;
 	}

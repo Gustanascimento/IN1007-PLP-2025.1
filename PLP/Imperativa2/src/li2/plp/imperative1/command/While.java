@@ -6,6 +6,7 @@ import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
 import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 
@@ -29,12 +30,13 @@ public class While implements Comando {
 	 * @return o ambiente depois de modificado pela execu��o do comando
 	 *         <code>while</code>.
 	 * @throws ErroTipoEntradaException 
+	 * @throws CicloDeDependenciaException 
 	 * 
 	 */
 	public AmbienteExecucaoImperativa executar(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException {
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException {
 		while (((ValorBooleano) expressao.avaliar(ambiente)).valor()) {
 			ambiente = comando.executar(ambiente);
 		}

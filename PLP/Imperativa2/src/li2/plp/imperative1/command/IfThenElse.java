@@ -8,6 +8,7 @@ import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 
 public class IfThenElse implements Comando {
 
@@ -33,12 +34,13 @@ public class IfThenElse implements Comando {
 	 * @return o ambiente depois de modificado pela execu��o do comando
 	 *         <code>if then else</code>.
 	 * @throws ErroTipoEntradaException 
+	 * @throws CicloDeDependenciaException 
 	 * 
 	 */
 	public AmbienteExecucaoImperativa executar(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException {
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException {
 		if (((ValorBooleano) expressao.avaliar(ambiente)).valor())
 			return comandoThen.executar(ambiente);
 		else

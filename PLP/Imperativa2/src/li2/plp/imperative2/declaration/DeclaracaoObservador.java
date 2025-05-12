@@ -10,6 +10,7 @@ import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
 import li2.plp.imperative2.command.ListaExpressao;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 import li2.plp.imperative2.observer.Subscriber;
 import java.util.UUID;
 
@@ -29,7 +30,7 @@ public class DeclaracaoObservador extends Declaracao implements Subscriber {
 
   @Override
   public AmbienteExecucaoImperativa elabora(AmbienteExecucaoImperativa ambiente)
-      throws IdentificadorJaDeclaradoException, IdentificadorNaoDeclaradoException, EntradaVaziaException {
+      throws IdentificadorJaDeclaradoException, IdentificadorNaoDeclaradoException, EntradaVaziaException, CicloDeDependenciaException {
     AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
     amb2.iniciaMapReativo(id, this);
     expressoes.avaliar(ambiente);
@@ -61,7 +62,7 @@ public class DeclaracaoObservador extends Declaracao implements Subscriber {
     try {
       ambiente = (AmbienteExecucaoImperativa2) procedimento.getComando().executar(ambiente);
     } catch (IdentificadorJaDeclaradoException | IdentificadorNaoDeclaradoException | EntradaVaziaException
-        | ErroTipoEntradaException e) {
+        | ErroTipoEntradaException | CicloDeDependenciaException e) {
       e.printStackTrace();
     }
     ambiente.restaura();

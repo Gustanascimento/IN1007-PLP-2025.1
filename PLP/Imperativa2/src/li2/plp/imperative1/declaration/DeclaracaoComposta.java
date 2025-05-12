@@ -5,6 +5,7 @@ import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 
 public class DeclaracaoComposta extends Declaracao {
 
@@ -21,7 +22,7 @@ public class DeclaracaoComposta extends Declaracao {
 	public AmbienteExecucaoImperativa elabora(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException {
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, CicloDeDependenciaException {
 		return declaracao2.elabora(declaracao1.elabora(ambiente));
 	}
 

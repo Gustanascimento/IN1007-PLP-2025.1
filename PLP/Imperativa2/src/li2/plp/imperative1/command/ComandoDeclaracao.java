@@ -7,6 +7,7 @@ import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 
 public class ComandoDeclaracao implements Comando {
 
@@ -33,7 +34,7 @@ public class ComandoDeclaracao implements Comando {
 	public AmbienteExecucaoImperativa executar(
 			AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException {
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException {
 		ambiente.incrementa();
 		ambiente = comando.executar(declaracao.elabora(ambiente));
 		ambiente.restaura();

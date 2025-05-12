@@ -1,6 +1,7 @@
 package li2.plp.imperative2.memory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Stack;
@@ -117,7 +118,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public void terminaComandoReativo(Id idArg) {
+	public void terminaComandoReativo(Id idArg) throws CicloDeDependenciaException {
 		DefReativo reativo = getReativo(idArg);
 		if (reativo != null) {
 			Subscriber s = reativo.getSubscriber();
@@ -127,6 +128,8 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 			publishers = null;
 			idReativoCorrente = null;
 		}
+
+    verificaCiclosDeDependencia();
 	}
 
 	/**
@@ -177,60 +180,86 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		if (reativo != null) reativo.notifySubscribers(this);
 	}
 
-// /**
-//  * Verifica se há ciclos de dependências entre variáveis reativas.
-//  * 
-//  * @throws CicloDeDependenciaException se um ciclo for detectado.
-//  */
-// public void verificaCiclosDeDependencia() throws CicloDeDependenciaException {
-//     HashMap<Id, Boolean> visitados = new HashMap<>();
-//     HashMap<Id, Boolean> pilhaRecursiva = new HashMap<>();
+  /**
+   * Verifica se há ciclos de dependências entre variáveis reativas.
+   * 
+   * @throws CicloDeDependenciaException se um ciclo for detectado.
+   */
+  public void verificaCiclosDeDependencia() throws CicloDeDependenciaException {
+    HashMap<Id, Boolean> visitados = new HashMap<>();
+    HashMap<Id, Boolean> pilhaRecursiva = new HashMap<>();
 
-//     // Itera sobre todos os identificadores na pilha do contexto reativo
-//     for (HashMap<Id, DefReativo> mapa : contextoReativo.getPilha()) {
-//         for (Id id : mapa.keySet()) {
-//             if (detectaCiclo(id, visitados, pilhaRecursiva)) {
-//                 throw new CicloDeDependenciaException("Ciclo de dependência detectado envolvendo a variável: " + id);
-//             }
-//         }
-//     }
-// }
+    // Itera sobre todos os identificadores na pilha do contexto reativo
+    for (HashMap<Id, DefReativo> mapa : contextoReativo.getPilha()) {
+        for (Id id : mapa.keySet()) {
+            List<Id> caminho = new ArrayList<>(); // Cria um novo caminho para cada tentativa
+            if (detectaCiclo(id, visitados, pilhaRecursiva, caminho)) {
+                Collections.reverse(caminho);
+                throw new CicloDeDependenciaException("Ciclo de dependência detectado: " + caminhoToString(caminho));
+            }
+        }
+    }
+}
 
-// /**
-//  * Função auxiliar para detectar ciclos usando busca em profundidade (DFS).
-//  */
-// private boolean detectaCiclo(Id id, HashMap<Id, Boolean> visitados, HashMap<Id, Boolean> pilhaRecursiva) {
-//     // Se a variável já está na pilha de recursão, há um ciclo
-//     if (pilhaRecursiva.getOrDefault(id, false)) {
-//         return true;
-//     }
+  /**
+   * Função auxiliar para detectar ciclos usando busca em profundidade (DFS).
+   */
+  private boolean detectaCiclo(Id id, HashMap<Id, Boolean> visitados, HashMap<Id, Boolean> pilhaRecursiva, List<Id> caminho) {
+    // Se a variável já está na pilha de recursão, há um ciclo
+    if (pilhaRecursiva.getOrDefault(id, false)) {
+        // Verifica se o ciclo detectado retorna ao nó inicial
+        if (!caminho.isEmpty() && caminho.get(0).equals(id)) {
+            caminho.add(id); // Adiciona o nó atual ao caminho para exibir o ciclo completo
+            return true; // Ciclo real detectado
+        }
+        return false; // Não é um ciclo real
+    }
 
-//     // Se já foi visitado e não está na pilha de recursão, não há ciclo
-//     if (visitados.getOrDefault(id, false)) {
-//         return false;
-//     }
+    // Se já foi visitado e não está na pilha de recursão, não há ciclo
+    if (visitados.getOrDefault(id, false)) {
+        return false;
+    }
 
-//     // Marca a variável como visitada e adiciona à pilha de recursão
-//     visitados.put(id, true);
-//     pilhaRecursiva.put(id, true);
+    // Marca a variável como visitada e adiciona à pilha de recursão
+    visitados.put(id, true);
+    pilhaRecursiva.put(id, true);
+    caminho.add(id); // Adiciona o nó atual ao caminho
 
-//     // Obtém o DefReativo associado à variável
-//     DefReativo reativo = getReativo(id);
-//     if (reativo != null) {
-//         // Itera sobre os dependentes (subscribers) da variável
-//         for (Subscriber subscriber : reativo.getSubscribers("update")) {
-//             if (subscriber instanceof DeclaracaoVariavelReativa) {
-//                 DeclaracaoVariavelReativa variavelReativa = (DeclaracaoVariavelReativa) subscriber;
-//                 if (detectaCiclo(variavelReativa.getId(), visitados, pilhaRecursiva)) {
-//                     return true;
-//                 }
-//             }
-//         }
-//     }
+    // Obtém o DefReativo associado à variável
+    DefReativo reativo = getReativo(id);
+    if (reativo != null) {
+        // Itera sobre os dependentes (subscribers) da variável
+        for (Subscriber subscriber : reativo.getSubscribers("update")) {
+            if (subscriber instanceof DeclaracaoVariavelReativa) {
+                DeclaracaoVariavelReativa variavelReativa = (DeclaracaoVariavelReativa) subscriber;
+                // Evita dependências transitivas
+                if (!pilhaRecursiva.getOrDefault(variavelReativa.getId(), false)) {
+                    if (detectaCiclo(variavelReativa.getId(), visitados, pilhaRecursiva, caminho)) {
+                        return true; // Ciclo detectado
+                    }
+                }
+            }
+        }
+    }
 
-//     // Remove a variável da pilha de recursão
-//     pilhaRecursiva.put(id, false);
-//     return false;
-// }
+    // Remove a variável da pilha de recursão
+    pilhaRecursiva.put(id, false);
+    caminho.remove(caminho.size() - 1); // Remove o nó do caminho ao sair da recursão
+    return false;
+}
+
+  /**
+   * Converte o caminho do ciclo em uma string legível.
+   */
+  private String caminhoToString(List<Id> caminho) {
+    StringBuilder sb = new StringBuilder();
+    for (int i = 0; i < caminho.size(); i++) {
+      sb.append(caminho.get(i));
+      if (i < caminho.size() - 1) {
+        sb.append(" -> ");
+      }
+    }
+    return sb.toString();
+  }
 
 }

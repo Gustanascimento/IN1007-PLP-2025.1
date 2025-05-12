@@ -15,6 +15,7 @@ import li2.plp.imperative1.memory.ListaValor;
 import li2.plp.imperative2.declaration.DefProcedimento;
 import li2.plp.imperative2.declaration.ListaDeclaracaoParametro;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+import li2.plp.imperative2.memory.CicloDeDependenciaException;
 import li2.plp.imperative2.util.TipoProcedimento;
 
 public class ChamadaProcedimento implements Comando {
@@ -31,7 +32,7 @@ public class ChamadaProcedimento implements Comando {
 
 	public AmbienteExecucaoImperativa executar(AmbienteExecucaoImperativa amb)
 			throws IdentificadorNaoDeclaradoException,
-			IdentificadorJaDeclaradoException, EntradaVaziaException, ErroTipoEntradaException {
+			IdentificadorJaDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException {
 		AmbienteExecucaoImperativa2 ambiente = (AmbienteExecucaoImperativa2) amb;
 		DefProcedimento procedimento = ambiente
 				.getProcedimento(nomeProcedimento);
