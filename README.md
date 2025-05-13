@@ -10,17 +10,36 @@
 - **Gustavo Prazeres Paz do Nascimento** - [gppn@cin.ufpe.br](mailto:gppn@cin.ufpe.br)  
 
 ## Introdução
-Este projeto tem como objetivo a redefinição da **Backus-Naur Form (BNF)** proposta na Linguagem Imperativa 2, para que seja capaz de implementar o paradigma [Reativo](https://en.wikipedia.org/wiki/Reactive_programming). A programação reativa é um paradigma de programação declarativa preocupado com fluxos de dados e a propagação de mudanças. Com esse paradigma, é possível expressar fluxos de dados estáticos (por exemplo, arrays) ou dinâmicos (por exemplo, emissores de eventos) com facilidade. A maioria dos frameworks do frontend, como **React**, **Vue** e **Angular**, utilizam esse paradigma para propagar atualizações para a [DOM](https://developer.mozilla.org/pt-BR/docs/Web/API/Document_Object_Model/Introduction) (Document Object Model) a partir de atualizações em variáveis reativas. Outro exemplo é uma linguagem de descrição de hardware como Verilog, onde a programação reativa permite que as mudanças sejam modeladas à medida que se propagam pelos circuitos.
+Este projeto tem como objetivo a redefinição da **Backus-Naur Form (BNF)** proposta na Linguagem Imperativa 2, para que seja capaz de implementar o paradigma [Reativo](https://en.wikipedia.org/wiki/Reactive_programming). A programação reativa é um paradigma de programação declarativa preocupado com fluxos de dados e a propagação de mudanças. Com esse paradigma, é possível expressar fluxos de dados estáticos (por exemplo, arrays) ou dinâmicos (por exemplo, emissores de eventos) com facilidade.
 
-### Objetivos
+A maioria dos frameworks de frontend, como **React**, **Vue** e **Angular**, utilizam esse paradigma para propagar atualizações para a [DOM](https://developer.mozilla.org/pt-BR/docs/Web/API/Document_Object_Model/Introduction) (Document Object Model) a partir de mudanças em variáveis reativas. Outro exemplo é uma linguagem de descrição de hardware como Verilog, onde a programação reativa permite que as mudanças sejam modeladas à medida que se propagam pelos circuitos.
+
+## Programação Reativa e o Padrão Observer
+![Observer](PLP/observer.jpg)
+
+O paradigma reativo está intimamente ligado ao padrão de projeto [Observer](https://refactoring.guru/design-patterns/observer), um padrão comportamental que define um mecanismo de assinatura (pub/sub), no qual múltiplos objetos (observadores) são automaticamente notificados sempre que o estado de outro objeto (publicador) é alterado.
+
+- Publisher (Sujeito): objeto que possui um estado interessante a ser monitorado.
+
+- Subscribers (Observadores): objetos interessados nas mudanças desse estado.
+
+O Publisher mantém uma lista de subscribers e:
+
+- Notifica todos os observadores quando ocorre uma mudança;
+
+- Possui métodos públicos que permitem adicionar e remover observadores da lista.
+
+## Objetivos
 Ao final do curso, a linguagem terá suporte a:
--  Variáveis reativas
--  "Observadores" de variáveis reativas
+
+- Variáveis reativas;
+
+- Observadores de variáveis reativas.
 
 Este repositório contém os arquivos e implementações necessárias para a adição de programação reativa na Linguagem Imperativa 2.
 
 ---
-Abaixo está a **Backus-Naur Form (BNF)** atualizada para a Linguagem Imperativa 2, incorporando os conceitos de programação reativa.
+Abaixo está a **Backus-Naur Form (BNF)** atualizada para a Linguagem Imperativa 2. As classes **em negrito** indicam as partes que foram adicionadas ou alteradas para suportar a programação reativa.
 
 
 ## BNF
@@ -78,13 +97,23 @@ Declaracao ::= [DeclaracaoVariavel](PLP/Imperativa2/src/li2/plp/imperative1/decl
 
 &emsp; &emsp; &emsp; &emsp;  &ensp;| [DeclaracaoComposta](PLP/Imperativa2/src/li2/plp/imperative1/declaration/DeclaracaoComposta.java)
 
-DeclaracaoVariavel ::= "var" Id "=" Expressao 
+&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java)
+
+**DeclaracaoVariavel ::= DeclaracaoVariavelReativa | DeclaracaoVariavelSimples**
+
+&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoVariavelReativa**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelReativa.java) ::= "react" Id "=" Expressao
+
+&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoVariavelSimples**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelSimples.java) ::= "var" Id "=" Expressao 
+
 
 DeclaracaoComposta ::= Declaracao "," Declaracao
 
 DeclaracaoProcedimento ::= [DeclaracaoProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoProcedimento.java) "proc" Id "(" [ ListaDeclaracaoParametro ] ")" "{" Comando "}"
 
-ListaDeclaracaoParametro ::= [DeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoParametro.java) Tipo Id | [ListaDeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/ListaDeclaracaoParametro.java) Tipo Id "," ListaDeclaracaoParametro
+DeclaracaoObservador ::= [DeclaracaoObservador](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
+
+ListaDeclaracaoParametro ::= [DeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoParametro.java) Tipo Id |\
+ &emsp; &emsp; &emsp; &emsp;  &ensp;| [ListaDeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/ListaDeclaracaoParametro.java) Tipo Id "," ListaDeclaracaoParametro
 
 Tipo ::= "string" | "int" | "boolean"
 
@@ -92,21 +121,29 @@ While ::= "while" Expressao "do" Comando
 
 IfThenElse ::= "if" Expressao "then" Comando "else" Comando
 
-IO ::= ["write" "(" Expressao ")"](PLP/Imperativa2/src/li2/plp/imperative1/command/Write.java) | ["read" "(" Id ")"](PLP/Imperativa2/src/li2/plp/imperative1/command/Read.java)
+IO ::= [Write](PLP/Imperativa2/src/li2/plp/imperative1/command/Write.java) "write" "(" Expressao ")" | [Read](PLP/Imperativa2/src/li2/plp/imperative1/command/Read.java) "read" "(" Id ")"
 
 ChamadaProcedimento ::= "call" Id "(" [[ ListaExpressao ]](PLP/Imperativa2/src/li2/plp/imperative2/command/ListaExpressao.java) ")" 
 
 ListaExpressao ::= Expressao | Expressao, ListaExpressao
 
+---
 ### Classes Auxiliares
-
 [AmbienteExecucaoImperativa2](PLP/Imperativa2/src/li2/plp/imperative2/memory/AmbienteExecucaoImperativa2.java)  
 [ContextoExecucaoImperativa2](PLP/Imperativa2/src/li2/plp/imperative2/memory/ContextoExecucaoImperativa2.java)  
 [ListaValor](PLP/Imperativa2/src/li2/plp/imperative1/memory/ListaValor.java)  
 [DefProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DefProcedimento.java)  
+[**DefReativo**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DefReativo.java)  
 [ProcedimentoJaDeclaradoException](PLP/Imperativa2/src/li2/plp/imperative2/memory/ProcedimentoJaDeclaradoException.java)  
 [ProcedimentoNaoDeclaradoException](PLP/Imperativa2/src/li2/plp/imperative2/memory/ProcedimentoNaoDeclaradoException.java)  
+[**Publisher**](PLP/Imperativa2/src/li2/plp/imperative2/observer/Publisher.java)  
+[**Subscriber**](PLP/Imperativa2/src/li2/plp/imperative2/observer/Subscriber.java)  
+[**VariavelReativaPublisher**](PLP/Imperativa2/src/li2/plp/imperative2/observer/VariavelReativaPublisher.java)  
+[**VariavelReativaJaDeclaradaException**](PLP/Imperativa2/src/li2/plp/imperative2/memory/VariavelReativaJaDeclaradaException.java)  
+[**VariavelReativaNaoDeclaradaException**](PLP/Imperativa2/src/li2/plp/imperative2/memory/VariavelReativaNaoDeclaradaException.java)  
 
 
+
+---
 ### Parser
 [Imperative2](PLP/Imperativa2/src/li2/plp/imperative2/parser/Imperative2.jj)
