@@ -101,16 +101,16 @@ Declaracao ::= [DeclaracaoVariavel](PLP/Imperativa2/src/li2/plp/imperative1/decl
 
 **DeclaracaoVariavel ::= DeclaracaoVariavelReativa | DeclaracaoVariavelSimples**
 
-&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoVariavelReativa**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelReativa.java) ::= "react" Id "=" Expressao
+[**DeclaracaoVariavelReativa**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelReativa.java) ::= "react" Id "=" Expressao
 
-&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoVariavelSimples**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelSimples.java) ::= "var" Id "=" Expressao 
+[**DeclaracaoVariavelSimples**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelSimples.java) ::= "var" Id "=" Expressao 
 
 
 DeclaracaoComposta ::= Declaracao "," Declaracao
 
-DeclaracaoProcedimento ::= [DeclaracaoProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoProcedimento.java) "proc" Id "(" [ ListaDeclaracaoParametro ] ")" "{" Comando "}"
+[DeclaracaoProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoProcedimento.java) ::= "proc" Id "(" [ ListaDeclaracaoParametro ] ")" "{" Comando "}"
 
-DeclaracaoObservador ::= [DeclaracaoObservador](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
+[DeclaracaoObservador](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) ::= "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
 
 ListaDeclaracaoParametro ::= [DeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoParametro.java) Tipo Id |\
  &emsp; &emsp; &emsp; &emsp;  &ensp;| [ListaDeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/ListaDeclaracaoParametro.java) Tipo Id "," ListaDeclaracaoParametro
@@ -131,16 +131,13 @@ ListaExpressao ::= Expressao | Expressao, ListaExpressao
 ### Classes Auxiliares
 [AmbienteExecucaoImperativa2](PLP/Imperativa2/src/li2/plp/imperative2/memory/AmbienteExecucaoImperativa2.java)  
 [ContextoExecucaoImperativa2](PLP/Imperativa2/src/li2/plp/imperative2/memory/ContextoExecucaoImperativa2.java)  
-[ListaValor](PLP/Imperativa2/src/li2/plp/imperative1/memory/ListaValor.java)  
-[DefProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DefProcedimento.java)  
 [**DefReativo**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DefReativo.java)  
-[ProcedimentoJaDeclaradoException](PLP/Imperativa2/src/li2/plp/imperative2/memory/ProcedimentoJaDeclaradoException.java)  
-[ProcedimentoNaoDeclaradoException](PLP/Imperativa2/src/li2/plp/imperative2/memory/ProcedimentoNaoDeclaradoException.java)  
 [**Publisher**](PLP/Imperativa2/src/li2/plp/imperative2/observer/Publisher.java)  
 [**Subscriber**](PLP/Imperativa2/src/li2/plp/imperative2/observer/Subscriber.java)  
 [**VariavelReativaPublisher**](PLP/Imperativa2/src/li2/plp/imperative2/observer/VariavelReativaPublisher.java)  
 [**VariavelReativaJaDeclaradaException**](PLP/Imperativa2/src/li2/plp/imperative2/memory/VariavelReativaJaDeclaradaException.java)  
 [**VariavelReativaNaoDeclaradaException**](PLP/Imperativa2/src/li2/plp/imperative2/memory/VariavelReativaNaoDeclaradaException.java)  
+[**CicloDeDependenciaException**](PLP/Imperativa2/src/li2/plp/imperative2/memory/CicloDeDependenciaException.java)
 
 
 
