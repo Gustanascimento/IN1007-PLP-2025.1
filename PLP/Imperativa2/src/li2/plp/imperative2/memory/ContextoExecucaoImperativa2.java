@@ -165,8 +165,8 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	public Valor get(Id idArg) throws VariavelNaoDeclaradaException {
 		if (publishers != null) {
 			DefReativo reativo = getReativo(idArg);
-			// é reativo e não é igual ao reativo corrente (variável reativa não pode depender dela mesma)
-			if (reativo != null && !idArg.equals(this.idReativoCorrente)) publishers.add(reativo);
+			// é reativo e não é igual ao reativo corrente (variável reativa não pode depender dela mesma) e não depende já desse reativo
+			if (reativo != null && !idArg.equals(this.idReativoCorrente) && !publishers.contains(reativo)) publishers.add(reativo);
 		}
 		return super.get(idArg);
 	}
@@ -191,13 +191,13 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 
     // Itera sobre todos os identificadores na pilha do contexto reativo
     for (HashMap<Id, DefReativo> mapa : contextoReativo.getPilha()) {
-        for (Id id : mapa.keySet()) {
-            List<Id> caminho = new ArrayList<>(); // Cria um novo caminho para cada tentativa
-            if (detectaCiclo(id, visitados, pilhaRecursiva, caminho)) {
-                Collections.reverse(caminho);
-                throw new CicloDeDependenciaException("Ciclo de dependência detectado: " + caminhoToString(caminho));
-            }
-        }
+			for (Id id : mapa.keySet()) {
+				List<Id> caminho = new ArrayList<>(); // Cria um novo caminho para cada tentativa
+				if (detectaCiclo(id, visitados, pilhaRecursiva, caminho)) {
+					Collections.reverse(caminho);
+					throw new CicloDeDependenciaException("Ciclo de dependência detectado: " + caminhoToString(caminho));
+				}
+			}
     }
 }
 
@@ -207,17 +207,13 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
   private boolean detectaCiclo(Id id, HashMap<Id, Boolean> visitados, HashMap<Id, Boolean> pilhaRecursiva, List<Id> caminho) {
     // Se a variável já está na pilha de recursão, há um ciclo
     if (pilhaRecursiva.getOrDefault(id, false)) {
-        // Verifica se o ciclo detectado retorna ao nó inicial
-        if (!caminho.isEmpty() && caminho.get(0).equals(id)) {
-            caminho.add(id); // Adiciona o nó atual ao caminho para exibir o ciclo completo
-            return true; // Ciclo real detectado
-        }
-        return false; // Não é um ciclo real
+			caminho.add(id); // Adiciona o nó atual ao caminho para exibir o ciclo completo
+			return true; // Ciclo detectado
     }
 
     // Se já foi visitado e não está na pilha de recursão, não há ciclo
     if (visitados.getOrDefault(id, false)) {
-        return false;
+			return false;
     }
 
     // Marca a variável como visitada e adiciona à pilha de recursão
@@ -228,18 +224,15 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
     // Obtém o DefReativo associado à variável
     DefReativo reativo = getReativo(id);
     if (reativo != null) {
-        // Itera sobre os dependentes (subscribers) da variável
-        for (Subscriber subscriber : reativo.getSubscribers("update")) {
-            if (subscriber instanceof DeclaracaoVariavelReativa) {
-                DeclaracaoVariavelReativa variavelReativa = (DeclaracaoVariavelReativa) subscriber;
-                // Evita dependências transitivas
-                if (!pilhaRecursiva.getOrDefault(variavelReativa.getId(), false)) {
-                    if (detectaCiclo(variavelReativa.getId(), visitados, pilhaRecursiva, caminho)) {
-                        return true; // Ciclo detectado
-                    }
-                }
-            }
-        }
+			// Itera sobre os dependentes (subscribers) da variável
+			for (Subscriber subscriber : reativo.getSubscribers("update")) {
+				if (subscriber instanceof DeclaracaoVariavelReativa) {
+					DeclaracaoVariavelReativa variavelReativa = (DeclaracaoVariavelReativa) subscriber;
+					if (detectaCiclo(variavelReativa.getId(), visitados, pilhaRecursiva, caminho)) {
+						return true; // Ciclo detectado
+					}
+				}
+			}
     }
 
     // Remove a variável da pilha de recursão

@@ -2,6 +2,7 @@ package li2.plp.imperative1.command;
 
 import li2.plp.expressions2.expression.Expressao;
 import li2.plp.expressions2.expression.Id;
+import li2.plp.expressions2.expression.Valor;
 import li2.plp.expressions2.memory.VariavelJaDeclaradaException;
 import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
@@ -38,8 +39,9 @@ public class Atribuicao implements Comando {
 		// como a variável vai receber uma nova expressão, se ela for reativa, limpa as dependências dela
 		amb2.limpaDependencias(id);
 		amb2.iniciaAtribuicaoReativa(id);
-		amb2.changeValor(id, expressao.avaliar(ambiente));
+		Valor expressaoAvaliada = expressao.avaliar(amb2);
 		amb2.terminaComandoReativo(id);
+		amb2.changeValor(id, expressaoAvaliada);
 		return amb2;
 	}
 
