@@ -97,20 +97,20 @@ Declaracao ::= [DeclaracaoVariavel](PLP/Imperativa2/src/li2/plp/imperative1/decl
 
 &emsp; &emsp; &emsp; &emsp;  &ensp;| [DeclaracaoComposta](PLP/Imperativa2/src/li2/plp/imperative1/declaration/DeclaracaoComposta.java)
 
-&emsp; &emsp; &emsp; &emsp;  &ensp;| [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java)
+&emsp; &emsp; &emsp; &emsp;  &ensp;| 👉 [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java)
 
 **DeclaracaoVariavel ::= DeclaracaoVariavelReativa | DeclaracaoVariavelSimples**
 
-[**DeclaracaoVariavelReativa**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelReativa.java) ::= "react" Id "=" Expressao
+👉 [**DeclaracaoVariavelReativa**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelReativa.java) ::= "react" Id "=" Expressao
 
-[**DeclaracaoVariavelSimples**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelSimples.java) ::= "var" Id "=" Expressao 
+👉 [**DeclaracaoVariavelSimples**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoVariavelSimples.java) ::= "var" Id "=" Expressao 
 
 
 DeclaracaoComposta ::= Declaracao "," Declaracao
 
 [DeclaracaoProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoProcedimento.java) ::= "proc" Id "(" [ ListaDeclaracaoParametro ] ")" "{" Comando "}"
 
-[DeclaracaoObservador](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) ::= "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
+👉 [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) ::= "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
 
 ListaDeclaracaoParametro ::= [DeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoParametro.java) Tipo Id |\
  &emsp; &emsp; &emsp; &emsp;  &ensp;| [ListaDeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/ListaDeclaracaoParametro.java) Tipo Id "," ListaDeclaracaoParametro
