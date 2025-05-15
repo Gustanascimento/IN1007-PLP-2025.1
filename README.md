@@ -110,7 +110,7 @@ DeclaracaoComposta ::= Declaracao "," Declaracao
 
 [DeclaracaoProcedimento](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoProcedimento.java) ::= "proc" Id "(" [ ListaDeclaracaoParametro ] ")" "{" Comando "}"
 
-👉 [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) ::= "watch" Id "(" [ ListaExpressao ] ")" "{" Comando "}"
+👉 [**DeclaracaoObservador**](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoObservador.java) ::= "watch" "(" [ ListaExpressao ] ")" "{" Comando "}"
 
 ListaDeclaracaoParametro ::= [DeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/DeclaracaoParametro.java) Tipo Id |\
  &emsp; &emsp; &emsp; &emsp;  &ensp;| [ListaDeclaracaoParametro](PLP/Imperativa2/src/li2/plp/imperative2/declaration/ListaDeclaracaoParametro.java) Tipo Id "," ListaDeclaracaoParametro
