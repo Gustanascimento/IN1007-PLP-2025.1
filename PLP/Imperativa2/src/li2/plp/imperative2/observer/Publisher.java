@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+import li2.plp.imperative2.memory.ObservadorException;
 
 public abstract class Publisher {
   
@@ -19,7 +20,7 @@ public abstract class Publisher {
     getSubscribers(eventType).remove(s);
   }
 
-  public void notifySubscribers(String eventType, AmbienteExecucaoImperativa2 amb) {
+  public void notifySubscribers(String eventType, AmbienteExecucaoImperativa2 amb) throws ObservadorException {
     List<Subscriber> subscribers = getSubscribers(eventType);
         for (Subscriber subscriber : subscribers) {
             subscriber.update(eventType, amb);

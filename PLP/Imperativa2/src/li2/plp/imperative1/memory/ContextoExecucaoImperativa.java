@@ -7,6 +7,7 @@ import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.expression.Valor;
 import li2.plp.expressions2.memory.ContextoExecucao;
 import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
+import li2.plp.imperative2.memory.ObservadorException;
 
 public class ContextoExecucaoImperativa extends ContextoExecucao 
 	implements AmbienteExecucaoImperativa {
@@ -54,7 +55,7 @@ public class ContextoExecucaoImperativa extends ContextoExecucao
      *          mapeado ao id dado nesta tabela.
      */
     public void changeValor(Id idArg, Valor valorId) 
-        	throws VariavelNaoDeclaradaException {   
+        	throws VariavelNaoDeclaradaException, ObservadorException {   
     	
     	Object result = null;
 		Stack<HashMap<Id,Valor>> auxStack = new Stack<HashMap<Id,Valor>>();

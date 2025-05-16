@@ -11,6 +11,7 @@ import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
 import li2.plp.imperative2.memory.CicloDeDependenciaException;
+import li2.plp.imperative2.memory.ObservadorException;
 import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
 import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
 
@@ -29,7 +30,7 @@ public interface Comando {
 	 */
 	AmbienteExecucaoImperativa executar(AmbienteExecucaoImperativa ambiente)
 			throws IdentificadorJaDeclaradoException,
-			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException;
+			IdentificadorNaoDeclaradoException, EntradaVaziaException, ErroTipoEntradaException, CicloDeDependenciaException, ObservadorException;
 
 	/**
 	 * Realiza a verificacao de tipos deste comando.

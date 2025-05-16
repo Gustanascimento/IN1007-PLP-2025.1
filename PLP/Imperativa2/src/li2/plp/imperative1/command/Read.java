@@ -8,6 +8,7 @@ import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative1.memory.EntradaVaziaException;
 import li2.plp.imperative1.memory.ErroTipoEntradaException;
+import li2.plp.imperative2.memory.ObservadorException;
 
 public class Read implements IO {
 
@@ -25,12 +26,13 @@ public class Read implements IO {
 	 * 
 	 * @return o ambiente depois de modificado pela execu��o do comando read.
 	 * @throws ErroTipoEntradaException 
+	 * @throws ObservadorException 
 	 * 
 	 */
 	public AmbienteExecucaoImperativa executar(
 			AmbienteExecucaoImperativa ambiente)
 			throws VariavelJaDeclaradaException, VariavelNaoDeclaradaException,
-			EntradaVaziaException, ErroTipoEntradaException {
+			EntradaVaziaException, ErroTipoEntradaException, ObservadorException {
 				
 		Valor valorID = ambiente.get(id);
 		Valor valorRead =ambiente.read();

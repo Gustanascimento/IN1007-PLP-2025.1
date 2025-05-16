@@ -172,7 +172,7 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	}
 
 	@Override
-	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException {
+	public void changeValor(Id idArg, Valor valorId) throws VariavelNaoDeclaradaException, ObservadorException {
 		// id se atualiza
 		super.changeValor(idArg, valorId);
 		// se ele for reativo, atualiza as variáveis reativas que dependem dele
@@ -189,17 +189,18 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
     HashMap<Id, Boolean> visitados = new HashMap<>();
     HashMap<Id, Boolean> pilhaRecursiva = new HashMap<>();
 
-    // Itera sobre todos os identificadores na pilha do contexto reativo
-    for (HashMap<Id, DefReativo> mapa : contextoReativo.getPilha()) {
-			for (Id id : mapa.keySet()) {
-				List<Id> caminho = new ArrayList<>(); // Cria um novo caminho para cada tentativa
-				if (detectaCiclo(id, visitados, pilhaRecursiva, caminho)) {
-					Collections.reverse(caminho);
-					throw new CicloDeDependenciaException("Ciclo de dependência detectado: " + caminhoToString(caminho));
-				}
-			}
+    // Só verifica o escopo atual (topo da pilha)
+    if (!contextoReativo.getPilha().isEmpty()) {
+        HashMap<Id, DefReativo> mapa = contextoReativo.getPilha().peek();
+        for (Id id : mapa.keySet()) {
+            List<Id> caminho = new ArrayList<>();
+            if (detectaCiclo(id, visitados, pilhaRecursiva, caminho)) {
+                Collections.reverse(caminho);
+                throw new CicloDeDependenciaException("Ciclo de dependência detectado: " + caminhoToString(caminho));
+            }
+        }
     }
-}
+	}
 
   /**
    * Função auxiliar para detectar ciclos usando busca em profundidade (DFS).

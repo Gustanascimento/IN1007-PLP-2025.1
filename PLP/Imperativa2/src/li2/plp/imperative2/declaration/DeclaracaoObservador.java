@@ -11,6 +11,7 @@ import li2.plp.imperative1.memory.ErroTipoEntradaException;
 import li2.plp.imperative2.command.ListaExpressao;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.memory.CicloDeDependenciaException;
+import li2.plp.imperative2.memory.ObservadorException;
 import li2.plp.imperative2.observer.Subscriber;
 import java.util.UUID;
 
@@ -56,21 +57,21 @@ public class DeclaracaoObservador extends Declaracao implements Subscriber {
     return resposta && expressoes.checaTipo(ambiente);
   }
 
-  public void executar(AmbienteExecucaoImperativa amb) {
+  public void executar(AmbienteExecucaoImperativa amb) throws ObservadorException {
 		AmbienteExecucaoImperativa2 ambiente = (AmbienteExecucaoImperativa2) amb;
     ambiente.incrementa();
     try {
       ambiente = (AmbienteExecucaoImperativa2) procedimento.getComando().executar(ambiente);
     } catch (IdentificadorJaDeclaradoException | IdentificadorNaoDeclaradoException | EntradaVaziaException
         | ErroTipoEntradaException | CicloDeDependenciaException e) {
-      e.printStackTrace();
+      throw new ObservadorException(e.getMessage());
     }
     ambiente.restaura();
   }
 
   
   @Override
-  public void update(String eventType, AmbienteExecucaoImperativa2 ambiente) {
+  public void update(String eventType, AmbienteExecucaoImperativa2 ambiente) throws ObservadorException {
     executar(ambiente);
   }
 }

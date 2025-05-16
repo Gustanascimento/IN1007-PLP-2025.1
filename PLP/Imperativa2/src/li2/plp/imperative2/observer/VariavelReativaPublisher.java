@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
+import li2.plp.imperative2.memory.ObservadorException;
 
 public class VariavelReativaPublisher extends Publisher {
   protected String eventType = "update";
@@ -31,7 +32,7 @@ public class VariavelReativaPublisher extends Publisher {
     unsubscribe(s, eventType);
   }
 
-  public void notifySubscribers(AmbienteExecucaoImperativa2 amb) {
+  public void notifySubscribers(AmbienteExecucaoImperativa2 amb) throws ObservadorException {
     notifySubscribers(eventType, amb);
   }
 

@@ -6,11 +6,14 @@ import li2.plp.expressions2.expression.Expressao;
 import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.memory.IdentificadorJaDeclaradoException;
 import li2.plp.expressions2.memory.IdentificadorNaoDeclaradoException;
+import li2.plp.expressions2.memory.VariavelJaDeclaradaException;
+import li2.plp.expressions2.memory.VariavelNaoDeclaradaException;
 import li2.plp.imperative1.declaration.DeclaracaoVariavel;
 import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.memory.CicloDeDependenciaException;
+import li2.plp.imperative2.memory.ObservadorException;
 import li2.plp.imperative2.observer.Subscriber;
 import li2.plp.imperative2.util.LoggerConfig;
 
@@ -22,7 +25,7 @@ public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Sub
   }
 
   @Override
-  public void update(String eventType, AmbienteExecucaoImperativa2 amb) {
+  public void update(String eventType, AmbienteExecucaoImperativa2 amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException, ObservadorException {
     amb.changeValor(getId(), getExpressao().avaliar(amb));
   }
 

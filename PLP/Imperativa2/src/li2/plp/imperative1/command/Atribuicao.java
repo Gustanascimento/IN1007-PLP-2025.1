@@ -9,6 +9,7 @@ import li2.plp.imperative1.memory.AmbienteCompilacaoImperativa;
 import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.memory.CicloDeDependenciaException;
+import li2.plp.imperative2.memory.ObservadorException;
 
 public class Atribuicao implements Comando {
 
@@ -30,11 +31,12 @@ public class Atribuicao implements Comando {
 	 * 
 	 * @return o ambiente modificado pela execu��o da atribui��o.
 	 * @throws CicloDeDependenciaException 
+	 * @throws ObservadorException 
 	 * 
 	 */
 	public AmbienteExecucaoImperativa executar(
 			AmbienteExecucaoImperativa ambiente)
-			throws VariavelJaDeclaradaException, VariavelNaoDeclaradaException, CicloDeDependenciaException {
+			throws VariavelJaDeclaradaException, VariavelNaoDeclaradaException, CicloDeDependenciaException, ObservadorException {
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
 		// como a variável vai receber uma nova expressão, se ela for reativa, limpa as dependências dela
 		amb2.limpaDependencias(id);
