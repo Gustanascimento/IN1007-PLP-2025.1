@@ -10,8 +10,9 @@ import li2.plp.imperative1.memory.AmbienteExecucaoImperativa;
 import li2.plp.imperative2.memory.AmbienteExecucaoImperativa2;
 import li2.plp.imperative2.memory.CicloDeDependenciaException;
 import li2.plp.imperative2.memory.ObservadorException;
+import li2.plp.imperative2.observer.Subscriber;
 
-public class Atribuicao implements Comando {
+public class Atribuicao implements Comando, Subscriber {
 
 	private Id id;
 
@@ -40,7 +41,7 @@ public class Atribuicao implements Comando {
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
 		// como a variável vai receber uma nova expressão, se ela for reativa, limpa as dependências dela
 		amb2.limpaDependencias(id);
-		amb2.iniciaAtribuicaoReativa(id);
+		amb2.iniciaAtribuicaoReativa(id, this);
 		Valor expressaoAvaliada = expressao.avaliar(amb2);
 		amb2.terminaComandoReativo(id);
 		amb2.changeValor(id, expressaoAvaliada);
@@ -64,6 +65,11 @@ public class Atribuicao implements Comando {
 			throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException {
 		return expressao.checaTipo(ambiente)
 				&& id.getTipo(ambiente).eIgual(expressao.getTipo(ambiente));
+	}
+
+	@Override
+	public void update(String eventType, AmbienteExecucaoImperativa2 ambiente) throws ObservadorException {
+		ambiente.changeValor(id, expressao.avaliar(ambiente));
 	}
 
 }

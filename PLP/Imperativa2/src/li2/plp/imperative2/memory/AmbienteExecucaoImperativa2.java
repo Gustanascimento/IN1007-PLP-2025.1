@@ -15,7 +15,7 @@ public interface AmbienteExecucaoImperativa2 extends AmbienteExecucaoImperativa 
 
 	public void iniciaMapReativo(Id idArg, Subscriber s);
 
-	public void iniciaAtribuicaoReativa(Id idArg);
+	public void iniciaAtribuicaoReativa(Id idArg, Subscriber s);
 
 	public void terminaComandoReativo(Id idArg) throws CicloDeDependenciaException;
 

@@ -18,6 +18,10 @@ public class DefReativo extends VariavelReativaPublisher {
     return this.s;
   }
 
+  public void setSubscriber(Subscriber s) {
+    this.s = s;
+  }
+
   @Override
   public String toString() {
   StringBuilder sb = new StringBuilder();

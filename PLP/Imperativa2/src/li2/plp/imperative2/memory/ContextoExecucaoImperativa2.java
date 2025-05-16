@@ -111,9 +111,10 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public void iniciaAtribuicaoReativa(Id idArg) {
+	public void iniciaAtribuicaoReativa(Id idArg, Subscriber s) {
 		DefReativo reativo = getReativo(idArg);
 		if (reativo != null) {
+			reativo.setSubscriber(s);
 			iniciaReativo(idArg);
 		}
 	}
