@@ -41,7 +41,7 @@ public class Atribuicao implements Comando, Subscriber {
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
 		// como a variável vai receber uma nova expressão, se ela for reativa, limpa as dependências dela
 		amb2.limpaDependencias(id);
-		amb2.iniciaAtribuicaoReativa(id, this);
+		amb2.iniciaAtribuicaoReativa(id, expressao, this);
 		Valor expressaoAvaliada = expressao.avaliar(amb2);
 		amb2.terminaComandoReativo(id);
 		amb2.changeValor(id, expressaoAvaliada);
@@ -69,7 +69,7 @@ public class Atribuicao implements Comando, Subscriber {
 
 	@Override
 	public void update(String eventType, AmbienteExecucaoImperativa2 ambiente) throws ObservadorException {
-		ambiente.changeValor(id, expressao.avaliar(ambiente));
+		ambiente.atualizaVariavelReativa(id);
 	}
 
 }

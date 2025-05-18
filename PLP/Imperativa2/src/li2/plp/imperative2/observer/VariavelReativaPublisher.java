@@ -36,6 +36,12 @@ public class VariavelReativaPublisher extends Publisher {
     notifySubscribers(eventType, amb);
   }
 
+  public void copiarSubscribersDe(VariavelReativaPublisher outro) {
+    for (Subscriber s : outro.getSubscribers(eventType)) {
+      this.subscribe(s);
+    }
+}
+
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();

@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Stack;
 import java.util.logging.Logger;
 
+import li2.plp.expressions2.expression.Expressao;
 import li2.plp.expressions2.expression.Id;
 import li2.plp.expressions2.expression.Valor;
 import li2.plp.expressions2.memory.Contexto;
@@ -101,8 +102,8 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		this.idReativoCorrente = idArg;
 	}
 
-	public void iniciaMapReativo(Id idArg, Subscriber s) {
-		DefReativo reativo = new DefReativo(s);
+	public void iniciaMapReativo(Id idArg, Expressao exp, Subscriber s) {
+		DefReativo reativo = new DefReativo(s, exp);
 		try {
 			this.contextoReativo.map(idArg, reativo);
 			iniciaReativo(idArg);
@@ -111,12 +112,20 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 	}
 
-	public void iniciaAtribuicaoReativa(Id idArg, Subscriber s) {
-		DefReativo reativo = getReativo(idArg);
-		if (reativo != null) {
-			reativo.setSubscriber(s);
+	public void iniciaAtribuicaoReativa(Id idArg, Expressao exp, Subscriber s) {
+		HashMap<Id, DefReativo> escopoAtual = contextoReativo.getPilha().peek();
+    DefReativo def = escopoAtual.get(idArg);
+
+		DefReativo defGlobal = getReativo(idArg);
+		if (defGlobal != null) {
+			if (def == null) {
+        // Shadowing: cria um novo DefReativo no escopo local, copiando do global
+					DefReativo defNovo = new DefReativo(s, exp);
+					defNovo.copiarSubscribersDe(defGlobal);
+        	escopoAtual.put(idArg, defNovo);
+			}
 			iniciaReativo(idArg);
-		}
+    }
 	}
 
 	public void terminaComandoReativo(Id idArg) throws CicloDeDependenciaException {
@@ -131,6 +140,14 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 		}
 
     verificaCiclosDeDependencia();
+	}
+
+	public void atualizaVariavelReativa(Id id) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException, ObservadorException {
+		DefReativo def = getReativo(id);
+    if (def != null) {
+        Expressao expAtual = def.getExpressao();
+        changeValor(id, expAtual.avaliar(this));
+    }
 	}
 
 	/**

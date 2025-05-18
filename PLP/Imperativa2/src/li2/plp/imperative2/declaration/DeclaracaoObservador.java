@@ -33,7 +33,7 @@ public class DeclaracaoObservador extends Declaracao implements Subscriber {
   public AmbienteExecucaoImperativa elabora(AmbienteExecucaoImperativa ambiente)
       throws IdentificadorJaDeclaradoException, IdentificadorNaoDeclaradoException, EntradaVaziaException, CicloDeDependenciaException {
     AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
-    amb2.iniciaMapReativo(id, this);
+    amb2.iniciaMapReativo(id, null, this);
     expressoes.avaliar(ambiente);
     amb2.mapProcedimento(id, procedimento);
     amb2.terminaComandoReativo(id);

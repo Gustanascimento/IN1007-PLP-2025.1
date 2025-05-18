@@ -26,7 +26,7 @@ public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Sub
 
   @Override
   public void update(String eventType, AmbienteExecucaoImperativa2 amb) throws VariavelNaoDeclaradaException, VariavelJaDeclaradaException, ObservadorException {
-    amb.changeValor(getId(), getExpressao().avaliar(amb));
+    amb.atualizaVariavelReativa(getId());
   }
 
   /**
@@ -46,7 +46,7 @@ public class DeclaracaoVariavelReativa extends DeclaracaoVariavel implements Sub
 			throws IdentificadorJaDeclaradoException,
 			IdentificadorNaoDeclaradoException, CicloDeDependenciaException {
 		AmbienteExecucaoImperativa2 amb2 = (AmbienteExecucaoImperativa2) ambiente;
-		amb2.iniciaMapReativo(getId(), this);
+		amb2.iniciaMapReativo(getId(), getExpressao(), this);
 		amb2.map(getId(), getExpressao().avaliar(amb2));
 		amb2.terminaComandoReativo(getId());
 		return amb2;
