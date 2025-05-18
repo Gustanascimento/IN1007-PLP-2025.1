@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Stack;
 import java.util.logging.Logger;
 
 import li2.plp.expressions2.expression.Expressao;
@@ -113,20 +112,22 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	}
 
 	public void iniciaAtribuicaoReativa(Id idArg, Expressao exp, Subscriber s) {
-		HashMap<Id, DefReativo> escopoAtual = contextoReativo.getPilha().peek();
-    DefReativo def = escopoAtual.get(idArg);
-
-		DefReativo defGlobal = getReativo(idArg);
-		if (defGlobal != null) {
-			if (def == null) {
-        // Shadowing: cria um novo DefReativo no escopo local, copiando do global
-					DefReativo defNovo = new DefReativo(s, exp);
-					defNovo.copiarSubscribersDe(defGlobal);
-        	escopoAtual.put(idArg, defNovo);
-			}
-			iniciaReativo(idArg);
+    DefReativo defGlobal = getReativo(idArg);
+    if (defGlobal != null) {
+        HashMap<Id, DefReativo> escopoAtual = contextoReativo.getPilha().peek();
+        DefReativo defLocal = escopoAtual.get(idArg);
+        if (defLocal == null) {
+            DefReativo defNovo = new DefReativo(s, exp);
+            defNovo.copiarSubscribersDe(defGlobal);
+            escopoAtual.put(idArg, defNovo);
+            defLocal = defNovo;
+        } else {
+            defLocal.setSubscriber(s);
+            defLocal.setExpressao(exp);
+        }
+        iniciaReativo(idArg);
     }
-	}
+}
 
 	public void terminaComandoReativo(Id idArg) throws CicloDeDependenciaException {
 		DefReativo reativo = getReativo(idArg);
@@ -155,29 +156,19 @@ public class ContextoExecucaoImperativa2 extends ContextoExecucaoImperativa
 	 * 
 	 */
 	public void limpaDependencias(Id idArg) {
-		DefReativo reativo = getReativo(idArg);
-		if (reativo == null) return;
+    // Pega o escopo atual (topo da pilha)
+    HashMap<Id, DefReativo> escopoAtual = contextoReativo.getPilha().peek();
+    DefReativo reativo = escopoAtual.get(idArg);
+    if (reativo == null) return;
 
-		Subscriber s = reativo.getSubscriber();
-		if (s == null) return;
-		
-		Stack<HashMap<Id,DefReativo>> auxStack = new Stack<HashMap<Id,DefReativo>>();
-		Stack<HashMap<Id,DefReativo>> stack = this.contextoReativo.getPilha();
-			
-		while (!stack.empty()) {
-			HashMap<Id,DefReativo> aux = stack.pop();
-			
-			for (DefReativo react : aux.values()) {
-				react.unsubscribe(s); // se desinscreve de todos que ele depende
-			}
+    Subscriber s = reativo.getSubscriber();
+    if (s == null) return;
 
-			auxStack.push(aux);
-		}
-		// coloca de volta na stack
-		while (!auxStack.empty()) {
-			stack.push(auxStack.pop());
-		}
-	}
+    // Remove o subscriber apenas dos DefReativos do escopo atual
+    for (DefReativo react : escopoAtual.values()) {
+        react.unsubscribe(s);
+    }
+}
 
 	@Override
 	public Valor get(Id idArg) throws VariavelNaoDeclaradaException {
